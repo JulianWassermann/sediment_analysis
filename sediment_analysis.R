@@ -10,8 +10,7 @@ library(dplyr)
 
 # given a plot, work out it's limits
 get_plot_limits<-function(plot_object) {
-# Use ggplot2, specifically a ggplot_build() function to extract the plot limits
-  
+
 }
 
 read_sed_data<-function(input_file) {
@@ -29,7 +28,7 @@ calculate_grain_percentages<-function(grain_sizes, grain_stats, gs_data_matrix) 
 
 
 main <- function(args) {
-        
+  gs_data_matrix <- data.frame(size = c("Silt", "VCSilt", "VFS"), percentage = c(10, 20, 30))
     if (is.null(args$depth_data)) {
           # default depths file
           depth_file <- "depth_data.csv"
