@@ -1,77 +1,122 @@
 #!/usr/bin/env Rscript
 suppressPackageStartupMessages({
-library(G2Sd)
-library(ggplot2)
-library(argparse)
-library(readr)
-library(dplyr)
-})
+  library(G2Sd)
+  library(ggplot2)
+  library(argparse)
+  library(dplyr)
+  library(tidyr)
+  library(patchwork)
+  library(readxl)
+}
 # you will need more libraries than those above
-
+# Main body, use call command, figure out how to return a function
 # given a plot, work out it's limits
-get_plot_limits<-function(plot_object) {
 
+get_plot_limits <- function(core_16) {
+  # Build ggplot object for the data sets
+  min_value <- min(core_16, na.rm = TRUE)
+  max_value <- max(core_16, na.rm = TRUE) 
+  
+  #Return min and max values
+  return(list(min = min_value, max = max_value))
 }
 
-read_sed_data<-function(input_file) {
-
+read_sed_data <- function(core_16) {
+  # Check if the core_16 is a string
+  if (!is.character(core_16)) {
+    stop("Error: `core_16` must be a string")
+  }
+  
+  # Implement logic to read sediment data from file
+  read_sed_data <- read_excel(core_16)
+  return(data)
 }
-
 
 read_core_depths <- function(depth_file) {
-
+  # Implement logic to read core depth data from file
+  data <- read.csv(depth_file)
+  return(data)
 }
 
 calculate_grain_percentages<-function(grain_sizes, grain_stats, gs_data_matrix) {
-
+  # Implement logic to calculate grain size percentages
 }
 
 
 main <- function(args) {
-  gs_data_matrix <- data.frame(size = c("Silt", "VCSilt", "VFS"), percentage = c(10, 20, 30))
-    if (is.null(args$depth_data)) {
-          # default depths file
-          depth_file <- "depth_data.csv"
-    } else {
-          depth_file <- args$depth_data 
-    }
+  
+  if (is.null(args$depth_data)) {
+    # default depths file
+    depth_file <- "depth_data.csv"
+  } else {
+    depth_file <- args$depth_data 
+  }
+  # Extracting plot limits on the x scale
+  # For percentage diagram
+  plot1 <- ggplot(core_16, aes(x=x, y=y)) + geom_bar(stat = "identity") + xlim (25,35) + ylim(0,1)
+  limits1 <- get_plot_limits(plot1)
+  print("Plot 1 Limits (Percentage Diagram):")
+  print(limits1)
+  
+  # For mean GS (mm) diagram
+  plot2 <- ggplot(core_16, aes(x=x, y=y)) + geom_line() + xlim (25,35) + ylim(0,1.25)
+  limits2 <- get_plot_limits(plot2)
+  print("Plot 2 Limits (Mean GS (mm) Diagram):")
+  print(limits2)
+  
+  # For kurtosis diagram
+  plot3 <- ggplot(core_16, aes(x=x, y=y)) + geom_line() + xlim (25,35) + ylim(0,10)
+  limits3 <- get_plot_limits(plot3)
+  print("Plot 3 Limits (Kurtosis Diagram):")
+  print(limits3)
+  
+  # For sorting diagram
+  plot4 <- ggplot(core_16, aes(x=x, y=y)) + geom_line() + xlim (25,35) + ylim(0,10)
+  limits4 <- get_plot_limits(plot4)
+  print("Plot 4 Limits (Sorting Diagram):")
+  print(limits4)
+  
+  # For skew diagram
+  plot5 <- ggplot(core_16, aes(x=x, y=y)) + geom_line() + xlim (25,35) + ylim(0,10)
+  limits5 <- get_plot_limits(plot5)
+  print("Plot 5 Limits (Skew Diagram):")
+  print(limits5)
+} 
+# now use the gradients package to get the mean, kurtosis, etc and the % 
+# in each standard grain size bucket
+grain_stats <- granstat(gs_data_matrix)
 
-    # now use the gradistats package to get the mean, kurtosis, etc and the % 
-    # in each standard grain size bucket
-    grain_stats <- granstat(gs_data_matrix)
+# set-up the order in which we want grainsizes to be displayed (and which we want to be displayed)
+grain_sizes <- c("Silt",
+                 "VCSilt",
+                 "VFS",
+                 "FS",
+                 "MS",
+                 "CS",
+                 "VCS",
+                 "VFG"
+)
+# Note, leaving off coarse grains
 
-    # set-up the order in which we want grainsizes to be displayed (and which we want to be displayed)
-    grain_sizes <- c("Silt",
-                     "VCSilt",
-                     "VFS",
-                     "FS",
-                     "MS",
-                     "CS",
-                     "VCS",
-                     "VFG"
-                     )
-    # Note, leaving off coarse grains
-
-    # save your plot
-}
+# save your plot
 
 if(sys.nframe() == 0) {
-
+  
   # main program, called via Rscript
   parser = ArgumentParser(
-                    prog="Sediment Analysis",
-                    description="Plot graphs of sediment grain stats for a single core"
-                    )
+    prog="Sediment Analysis",
+    description="Plot graphs of sediment grain stats for a single core"
+  )
   parser$add_argument("core_filename",
-                    help="the file to read the core data from")
+                      help="the file to read the core data from")
   parser$add_argument("output_filename",
-                    help="the file to save the graphic to")
+                      help="the file to save the graphic to")
   parser$add_argument('-v', '--verbose',
-                    action='store_true',
-                    help="Print progress")
+                      action='store_true',
+                      help="Print progress")
   parser$add_argument('-d', '--depth_file',
-                    help="Optional file for depth data")
-
+                      help="Optional file for depth data")
+  
   args = parser$parse_args()  
   main(args)
 }
