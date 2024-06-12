@@ -7,17 +7,17 @@ suppressPackageStartupMessages({
   library(tidyr)
   library(patchwork)
   library(readxl)
-}
-# you will need more libraries than those above
-# Main body, use call command, figure out how to return a function
-# given a plot, work out it's limits
+})
 
+# Main body, use call command, figure out how to return a function
+# given a plot, work out its limits
 get_plot_limits <- function(core_16) {
   # Build ggplot object for the data sets
-  min_value <- min(core_16, na.rm = TRUE)
-  max_value <- max(core_16, na.rm = TRUE) 
+  combined_vector <- unlist(core_16)
+  min_value <- min(combined_vector, na.rm = TRUE)
+  max_value <- max(combined_vector, na.rm = TRUE) 
   
-  #Return min and max values
+  # Return min and max values
   return(list(min = min_value, max = max_value))
 }
 
@@ -28,7 +28,7 @@ read_sed_data <- function(core_16) {
   }
   
   # Implement logic to read sediment data from file
-  read_sed_data <- read_excel(core_16)
+  data <- read_excel(core_16)
   return(data)
 }
 
@@ -38,55 +38,63 @@ read_core_depths <- function(depth_file) {
   return(data)
 }
 
-calculate_grain_percentages<-function(grain_sizes, grain_stats, gs_data_matrix) {
-  # Implement logic to calculate grain size percentages
+calculate_grain_percentages <- function(grain_sizes, grain_stats, gs_data_matrix) {
+  # Placeholder for the actual implementation
 }
 
-
 main <- function(args) {
-  
   if (is.null(args$depth_data)) {
     # default depths file
     depth_file <- "depth_data.csv"
   } else {
     depth_file <- args$depth_data 
   }
-  # Extracting plot limits on the x scale
+  
+  grain_stats <- granstat(gs_data_matrix)
+  
   # For percentage diagram
-  plot1 <- ggplot(core_16, aes(x=x, y=y)) + geom_bar(stat = "identity") + xlim (25,35) + ylim(0,1)
+  plot1 <- ggplot(grain_stats, aes(x=x, y=y)) + geom_bar(stat = "identity") + xlim(25, 35) + ylim(0, 1)
   limits1 <- get_plot_limits(plot1)
   print("Plot 1 Limits (Percentage Diagram):")
   print(limits1)
   
   # For mean GS (mm) diagram
-  plot2 <- ggplot(core_16, aes(x=x, y=y)) + geom_line() + xlim (25,35) + ylim(0,1.25)
+  plot2 <- ggplot(grain_stats, aes(x=x, y=y)) + geom_line() + xlim(25, 35) + ylim(0, 1.25)
   limits2 <- get_plot_limits(plot2)
   print("Plot 2 Limits (Mean GS (mm) Diagram):")
   print(limits2)
   
   # For kurtosis diagram
-  plot3 <- ggplot(core_16, aes(x=x, y=y)) + geom_line() + xlim (25,35) + ylim(0,10)
+  plot3 <- ggplot(grain_stats, aes(x=x, y=y)) + geom_line() + xlim(25, 35) + ylim(0, 10)
   limits3 <- get_plot_limits(plot3)
   print("Plot 3 Limits (Kurtosis Diagram):")
   print(limits3)
   
   # For sorting diagram
-  plot4 <- ggplot(core_16, aes(x=x, y=y)) + geom_line() + xlim (25,35) + ylim(0,10)
+  plot4 <- ggplot(grain_stats, aes(x=x, y=y)) + geom_line() + xlim(25, 35) + ylim(0, 10)
   limits4 <- get_plot_limits(plot4)
   print("Plot 4 Limits (Sorting Diagram):")
   print(limits4)
   
   # For skew diagram
-  plot5 <- ggplot(core_16, aes(x=x, y=y)) + geom_line() + xlim (25,35) + ylim(0,10)
+  plot5 <- ggplot(grain_stats, aes(x=x, y=y)) + geom_line() + xlim(25, 35) + ylim(0, 10)
   limits5 <- get_plot_limits(plot5)
   print("Plot 5 Limits (Skew Diagram):")
   print(limits5)
-} 
+  
+  # Plotting Diagrams
+  ggsave("plot1.pdf", plot=plot1)
+  ggsave("plot2.pdf", plot=plot2)
+  ggsave("plot3.pdf", plot=plot3)
+  ggsave("plot4.pdf", plot=plot4)
+  ggsave("plot5.pdf", plot=plot5)
+}
+
 # now use the gradients package to get the mean, kurtosis, etc and the % 
 # in each standard grain size bucket
 grain_stats <- granstat(gs_data_matrix)
 
-# set-up the order in which we want grainsizes to be displayed (and which we want to be displayed)
+# set-up the order in which we want grain sizes to be displayed (and which we want to be displayed)
 grain_sizes <- c("Silt",
                  "VCSilt",
                  "VFS",
@@ -103,7 +111,7 @@ grain_sizes <- c("Silt",
 if(sys.nframe() == 0) {
   
   # main program, called via Rscript
-  parser = ArgumentParser(
+  parser <- ArgumentParser(
     prog="Sediment Analysis",
     description="Plot graphs of sediment grain stats for a single core"
   )
@@ -117,6 +125,6 @@ if(sys.nframe() == 0) {
   parser$add_argument('-d', '--depth_file',
                       help="Optional file for depth data")
   
-  args = parser$parse_args()  
+  args <- parser$parse_args()  
   main(args)
 }
