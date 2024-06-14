@@ -8,6 +8,8 @@ suppressPackageStartupMessages({
   library(patchwork)
   library(readxl)
   library(qtl)
+  library(moments)
+  library(e1071)
 })
 # you will need more libraries than those above
 
@@ -86,25 +88,117 @@ main <- function(args) {
   #
   sed_data_percentages <- calculate_grain_percentages(sed_data)
   
-  colsum
-  # now use the gradistats package to get the mean, kurtosis, etc and the % 
-  # in each standard grain size bucket
-  grain_stats <- granstat(gs_data_matrix)
+  #Calculatig mean values
+  Silt_mean <- colMeans(sed_data[, 2:64])
+  VCSilt_mean <- colMeans(sed_data[, 65:70])
+  VFS_mean <- colMeans(sed_data[, 71:76])
+  FS_mean <- colMeans(sed_data[, 77:82])
+  MS_mean <- colMeans(sed_data[, 83:88])
+  CS_mean <- colMeans(sed_data[89:94])
+  VCS_mean <- colMeans(sed_data[95:100])
+  VFG_mean <- colMeans(sed_data[101])
   
-  # set-up the order in which we want grainsizes to be displayed (and which we want to be displayed)
-  grain_sizes <- c("Silt",
-                   "VCSilt",
-                   "VFS",
-                   "FS",
-                   "MS",
-                   "CS",
-                   "VCS",
-                   "VFG"
-  )
-  # Note, leaving off coarse grains
-  
-  # save your plot
+  print(length(Silt_mean))    
+  print(length(VCSilt_mean))  
+  print(length(VFS_mean))     
+  print(length(FS_mean))      
+  print(length(MS_mean))      
+  print(length(CS_mean))      
+  print(length(VCS_mean))     
+  print(length(VFG_mean))
 }
+
+# Calculate kurtosis for each specified range
+
+
+kurtosis_Silt <- apply(sed_data[ , c(2:64)], 1, moments::kurtosis)
+kurtosis_VCSilt <- apply(sed_data[ , c(65:70)], 1, moments::kurtosis)
+kurtosis_VFS <- apply(sed_data[ , c(71:76)], 1, moments::kurtosis)
+kurtosis_FS <- apply(sed_data[ , c(77:82)], 1, moments::kurtosis)
+kurtosis_MS <- apply(sed_data[ , c(83:88)], 1, moments::kurtosis)
+kurtosis_CS <- apply(sed_data[ , c(89:94)], 1, moments::kurtosis)
+kurtosis_VCS <- apply(sed_data[ , c(95:100)], 1, moments::kurtosis)
+kurtosis_VFG <- apply(sed_data[ , c(101)], 1, moments::kurtosis)
+
+# Combine the kurtosis results into a data frame
+sed_data_kurtosis <- data.frame(Silt = kurtosis_Silt,
+                                VCSilt = kurtosis_VCSilt,
+                                VFS = kurtosis_VFS,
+                                FS = kurtosis_FS,
+                                MS = kurtosis_MS,
+                                CS = kurtosis_CS,
+                                VCS = kurtosis_VCS,
+                                VFG = kurtosis_VFG)
+
+# Display the resulting data frame
+print(sed_data_kurtosis)
+
+
+# Since they have different lengths, can't combine them directly into a data frame.
+# Code bellow creats a list
+means_list <- list(
+  Silt = Silt_mean,
+  VCSilt = VCSilt_mean,
+  VFS = VFS_mean,
+  FS = FS_mean,
+  MS = MS_mean,
+  CS = CS_mean,
+  VCS = VCS_mean,
+  VFG = VFG_mean
+)
+
+print(means_list)
+
+skewness_Silt <- apply(sed_data[ , c(2:64)], 1, moments::skewness)
+skewness_VCSilt <- apply(sed_data[ , c(65:70)], 1, moments::skewness)
+skewness_VFS <- apply(sed_data[ , c(71:76)], 1, moments::skewness)
+skewness_FS <- apply(sed_data[ , c(77:82)], 1, moments::skewness)
+skewness_MS <- apply(sed_data[ , c(83:88)], 1, moments::skewness)
+skewness_CS <- apply(sed_data[ , c(89:94)], 1, moments::skewness)
+skewness_VCS <- apply(sed_data[ , c(95:100)], 1, moments::skewness)
+skewness_VFG <- apply(sed_data[ , c(101)], 1, moments::skewness)
+
+# Combine skewness results into a data frame
+sed_data_skewness <- data.frame(Silt = skewness_Silt,
+                                VCSilt = skewness_VCSilt,
+                                VFS = skewness_VFS,
+                                FS = skewness_FS,
+                                MS = skewness_MS,
+                                CS = skewness_CS,
+                                VCS = skewness_VCS,
+                                VFG = skewness_VFG)
+
+# Calculate sorting (standard deviation) for each specified range
+sorting_Silt <- apply(sed_data[ , c(2:64)], 1, sd)
+sorting_VCSilt <- apply(sed_data[ , c(65:70)], 1, sd)
+sorting_VFS <- apply(sed_data[ , c(71:76)], 1, sd)
+sorting_FS <- apply(sed_data[ , c(77:82)], 1, sd)
+sorting_MS <- apply(sed_data[ , c(83:88)], 1, sd)
+sorting_CS <- apply(sed_data[ , c(89:94)], 1, sd)
+sorting_VCS <- apply(sed_data[ , c(95:100)], 1, sd)
+sorting_VFG <- apply(sed_data[ , c(101)], 1, sd)
+
+# Combine the sorting results into a data frame
+sed_data_sorting <- data.frame(Silt = sorting_Silt,
+                               VCSilt = sorting_VCSilt,
+                               VFS = sorting_VFS,
+                               FS = sorting_FS,
+                               MS = sorting_MS,
+                               CS = sorting_CS,
+                               VCS = sorting_VCS,
+                               VFG = sorting_VFG)
+
+
+# now use the gradistats package to get the mean, kurtosis, etc and the %
+# in each standard grain size bucket
+#grain_stats <- granstat(gs_data_matrix)
+
+# set-up the order in which we want grainsizes to be displayed (and which we want to be displayed)
+#grain_sizes <- c("Silt","VCSilt","VFS","FS","MS", "CS", "VCS","VFG")
+# Note, leaving off coarse grains
+
+# save your plot
+
 
 if(sys.nframe() == 0) {
   
@@ -126,4 +220,3 @@ if(sys.nframe() == 0) {
   args = parser$parse_args()  
   main(args)
 }
-
