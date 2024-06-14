@@ -107,7 +107,7 @@ main <- function(args) {
   VCS_mean <- colMeans(sed_data[95:100])
   VFG_mean <- colMeans(sed_data[101])
   
-  ## Print the lengths of the calculated mean vectors
+  # Print the lengths of the calculated mean vectors
   print(length(Silt_mean))    
   print(length(VCSilt_mean))  
   print(length(VFS_mean))     
@@ -116,6 +116,20 @@ main <- function(args) {
   print(length(CS_mean))      
   print(length(VCS_mean))     
   print(length(VFG_mean))
+  
+  # Since they have different lengths, can't combine them directly into a data frame.
+  # Code creats a list
+  means_list <- list(
+    Silt = Silt_mean,
+    VCSilt = VCSilt_mean,
+    VFS = VFS_mean,
+    FS = FS_mean,
+    MS = MS_mean,
+    CS = CS_mean,
+    VCS = VCS_mean,
+    VFG = VFG_mean
+  )
+  print(means_list)
   
   
   # Calculate kurtosis for each specified range
@@ -140,22 +154,6 @@ main <- function(args) {
   
   # Display the resulting data frame
   print(sed_data_kurtosis)
-  
-  
-  # Since they have different lengths, can't combine them directly into a data frame.
-  # Code creats a list
-  means_list <- list(
-    Silt = Silt_mean,
-    VCSilt = VCSilt_mean,
-    VFS = VFS_mean,
-    FS = FS_mean,
-    MS = MS_mean,
-    CS = CS_mean,
-    VCS = VCS_mean,
-    VFG = VFG_mean
-  )
-  
-  print(means_list)
   
   # Calculate skewness for each specified range
   skewness_Silt <- apply(sed_data[ , c(2:64)], 1, moments::skewness)
